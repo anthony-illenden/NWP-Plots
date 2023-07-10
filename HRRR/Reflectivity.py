@@ -36,6 +36,12 @@ def radar_colormap():
 
     return mpl.colors.ListedColormap(nws_reflectivity_colors)
 
+def find_time_var(var, time_basename='time'):
+    for coord_name in var.coordinates.split():
+        if coord_name.startswith(time_basename):
+            return coord_name
+    raise ValueError('No time variable found for ' + var.name)
+
 rap_catalog = ('https://thredds-test.unidata.ucar.edu/thredds/catalog/grib/NCEP/HRRR/CONUS_2p5km/catalog.html?dataset=grib/NCEP/HRRR/CONUS_2p5km/Best')
 
 cat = TDSCatalog(rap_catalog)
@@ -55,10 +61,14 @@ dlat = data.variables['Composite_reflectivity_entire_atmosphere'].dimensions[1]
 dlon = data.variables['Composite_reflectivity_entire_atmosphere'].dimensions[2]
 lat_var = 1000*(data.variables[dlat][:])
 lon_var = 1000*(data.variables[dlon][:])
+time_var = data.variables[find_time_var(ref_var)]
+
 
 ref = ref_var[:].squeeze()
 lat = lat_var[:].squeeze()
 lon = lon_var[:].squeeze()
+
+time = num2date(time_var[:].squeeze(), time_var.units)
 
 lon_2d, lat_2d = np.meshgrid(lon, lat)
 
@@ -89,3 +99,4 @@ CM = ax.pcolormesh(lon_2d, lat_2d, ref, norm=norm, cmap=cmap)
 # Make a colorbar for the color mesh.
 cbar = fig.colorbar(CM,shrink=0.5)
 cbar.set_label(r'1km Reflectivity (dBz)', size='large')
+plt.title('Composite Reflectivity {:s} UTC'.format(str(time)), loc='right')
