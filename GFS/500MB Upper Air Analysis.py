@@ -87,7 +87,7 @@ cf = ax.contourf(lon_2d, lat_2d, wnd, range(40, 160, 20), cmap=plt.cm.BuPu,
 isotach = ax.contour(lon_2d, lat_2d, wnd, range(40, 160, 20), colors='black', transform=datacrs)
 ax.clabel(isotach, fontsize=12, inline=1, inline_spacing=4, fmt='%i')
 
-plt.colorbar(cf, orientation='horizontal', pad=0, aspect=50, shrink=0.625)
+plt.colorbar(cf, orientation='horizontal', pad=0, aspect=50, shrink=0.50, label = 'Isotachs (kt)')
 
 ax.barbs(lon_2d, lat_2d, u_wind500.m, v_wind500.m, pivot='middle', color='black', regrid_shape=12, transform=datacrs, zorder=2)
 
