@@ -23,7 +23,7 @@ cat = TDSCatalog(catalog_url)
 dataset = cat.datasets[dataset_name]
 ncss = dataset.subset()
 query = ncss.query()
-query.lonlat_box(north=55, south=30, east=-70, west=-115).time(datetime.utcnow() + timedelta(hours=126))
+query.lonlat_box(north=55, south=30, east=-70, west=-115).time(datetime.utcnow() + timedelta(hours=176))
 query.accept('netcdf4')
 
 print(ncss.variables)
@@ -81,10 +81,10 @@ cf = ax.contour(lon_2d, lat_2d, temp, range(-50, 10, 3),
                  transform=datacrs, colors='red', linestlye = '--')
 ax.clabel(cf, fontsize=12, inline=1, inline_spacing=4, fmt='%i')
 
-cf = ax.contourf(lon_2d, lat_2d, wnd, range(40, 160, 20), cmap=plt.cm.BuPu,
+cf = ax.contourf(lon_2d, lat_2d, wnd, range(0, 160, 20), cmap=plt.cm.BuPu,
                  transform=datacrs)
 
-isotach = ax.contour(lon_2d, lat_2d, wnd, range(40, 160, 20), colors='black', transform=datacrs)
+isotach = ax.contour(lon_2d, lat_2d, wnd, range(0, 160, 20), colors='black', transform=datacrs)
 ax.clabel(isotach, fontsize=12, inline=1, inline_spacing=4, fmt='%i')
 
 plt.colorbar(cf, orientation='horizontal', pad=0, aspect=50, shrink=0.50, label = 'Isotachs (kt)')
@@ -92,4 +92,4 @@ plt.colorbar(cf, orientation='horizontal', pad=0, aspect=50, shrink=0.50, label 
 ax.barbs(lon_2d, lat_2d, u_wind500.m, v_wind500.m, pivot='middle', color='black', regrid_shape=12, transform=datacrs, zorder=2)
 
 plt.title('GFS 500MB: Geo. Potential Heights, Temp, and Winds', loc='left')
-plt.title('VALID: {:s} UTC'.format(str(time)), loc='right')
+plt.title('{:s} UTC'.format(str(time)), loc='right')
