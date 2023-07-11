@@ -64,7 +64,7 @@ rh_var = rh_var[:].squeeze()
 u_wind850 = u_wind_var850[:].squeeze()
 v_wind850 = v_wind_var850[:].squeeze()
 
-rh_var = rh_var * units.percent
+#rh_var = rh_var * units.percent
 
 temp = units.Quantity(temp, 'kelvin')
 temp = temp.to('degC')
@@ -83,10 +83,10 @@ time = num2date(time_var[:].squeeze(), time_var.units)
 lon_2d, lat_2d = np.meshgrid(lon, lat)
 
 # Smooth mslp data
-#rh = ndimage.gaussian_filter(rh_var, sigma=2, order=0)
-mr = mpcalc.mixing_ratio_from_relative_humidity(850 * units('hPa'), temp, rh_var, fill_value=0.0)
+rh = ndimage.gaussian_filter(rh_var, sigma=2, order=0)
+#mr = mpcalc.mixing_ratio_from_relative_humidity(850 * units('hPa'), temp, rh_var, fill_value=0.0)
 
-mr = ndimage.gaussian_filter(mr, sigma=2, order=0)
+#mr = ndimage.gaussian_filter(mr, sigma=2, order=0)
 
 mapcrs = ccrs.LambertConformal(central_longitude=-85.6, central_latitude=44.3, standard_parallels=(30, 60))  
 datacrs = ccrs.PlateCarree() 
@@ -103,15 +103,15 @@ ax.set_extent([-92, -80, 40, 49], datacrs)
 ax.add_feature(cfeature.STATES, edgecolor='black', linewidth=2)
 
 # Contour the MSLP
-# = ax.contour(lon_2d, lat_2d, rh, colors='lime', linewidths=6, transform=datacrs)
-#ax.clabel(c, fontsize=12, inline=1, inline_spacing=4, fmt='%i')
+c = ax.contourf(lon_2d, lat_2d, rh,range(10, 105, 5), cmap=plt.cm.gist_earth_r, linewidths=3, transform=datacrs)
+ax.clabel(c, fontsize=12, inline=1, inline_spacing=4, fmt='%i')
 
 #contour_potemp = ax.contour(lon_2d, lat_2d, potemp, colors='red', levels=range(0, 500, 2), transform=datacrs)
 #ax.clabel(contour_potemp, fontsize=12, inline=1, inline_spacing=4, fmt='%i')
 
-cf = ax.contourf(lon_2d, lat_2d, mr, range(0, 20, 2),
-                 transform=datacrs, cmap=plt.cm.gist_earth_r)
-plt.colorbar(cf, orientation='horizontal', extend=max, aspect=65, pad=0,
+#cf = ax.contourf(lon_2d, lat_2d, mr, range(0, 20, 2),
+#                 transform=datacrs, cmap=plt.cm.gist_earth_r)
+plt.colorbar(c, orientation='horizontal', extend=max, aspect=65, pad=0,
              extendrect='True', shrink=0.625)
 
 ax.barbs(lon_2d, lat_2d, u_wind850.m, v_wind850.m, pivot='middle', color='black', regrid_shape=20, transform=datacrs, zorder=2)
