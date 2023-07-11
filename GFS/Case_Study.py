@@ -23,7 +23,7 @@ from datetime import datetime
 
 catalog_url = 'https://www.ncei.noaa.gov/thredds/catalog/model-gfs-g4-anl-files/202305/20230501/catalog.html?dataset=gfs-g4-anl-files/202305/20230501/gfs_4_20230501_0000_000.grb2'
 
-dt = datetime(2023, 5, 1, 00)
+dt = datetime(2023, 5, 1, 0)
 
 #new_date = dt.strftime('%Y%m%d_%H%M')
 
@@ -84,9 +84,14 @@ lon_2d, lat_2d = np.meshgrid(lon, lat)
 
 # Smooth mslp data
 rh = ndimage.gaussian_filter(rh_var, sigma=2, order=0)
-#mr = mpcalc.mixing_ratio_from_relative_humidity(850 * units('hPa'), temp, rh_var, fill_value=0.0)
 
-#mr = ndimage.gaussian_filter(mr, sigma=2, order=0)
+potemp = mpcalc.potential_temperature(850 * units('hPa'), temp)
+
+potemp = ndimage.gaussian_filter(potemp, sigma=2, order=0)
+
+mr = mpcalc.mixing_ratio_from_relative_humidity(850 * units('hPa'), temp, rh)
+
+mr = ndimage.gaussian_filter(mr, sigma=2, order=0)
 
 mapcrs = ccrs.LambertConformal(central_longitude=-85.6, central_latitude=44.3, standard_parallels=(30, 60))  
 datacrs = ccrs.PlateCarree() 
@@ -103,18 +108,18 @@ ax.set_extent([-92, -80, 40, 49], datacrs)
 ax.add_feature(cfeature.STATES, edgecolor='black', linewidth=2)
 
 # Contour the MSLP
-c = ax.contourf(lon_2d, lat_2d, rh,range(10, 105, 5), cmap=plt.cm.gist_earth_r, linewidths=3, transform=datacrs)
-ax.clabel(c, fontsize=12, inline=1, inline_spacing=4, fmt='%i')
+#c = ax.contourf(lon_2d, lat_2d, rh,range(10, 105, 5), cmap=plt.cm.gist_earth_r, linewidths=3, transform=datacrs)
+#ax.clabel(c, fontsize=12, inline=1, inline_spacing=4, fmt='%i')
 
-#contour_potemp = ax.contour(lon_2d, lat_2d, potemp, colors='red', levels=range(0, 500, 2), transform=datacrs)
-#ax.clabel(contour_potemp, fontsize=12, inline=1, inline_spacing=4, fmt='%i')
+contour_potemp = ax.contour(lon_2d, lat_2d, potemp, colors='red', levels=range(0, 325, 2), transform=datacrs, linewidths=3, zorder=2)
+ax.clabel(contour_potemp, fontsize=12, inline=1, inline_spacing=2, fmt='%i')
 
-#cf = ax.contourf(lon_2d, lat_2d, mr, range(0, 20, 2),
-#                 transform=datacrs, cmap=plt.cm.gist_earth_r)
-plt.colorbar(c, orientation='horizontal', extend=max, aspect=65, pad=0,
+cf = ax.contourf(lon_2d, lat_2d, mr, range(0, 5, 1),
+                 transform=datacrs, cmap=plt.cm.gist_earth_r)
+plt.colorbar(cf, orientation='horizontal', extend=max, aspect=65, pad=0,
              extendrect='True', shrink=0.625)
 
-ax.barbs(lon_2d, lat_2d, u_wind850.m, v_wind850.m, pivot='middle', color='black', regrid_shape=20, transform=datacrs, zorder=2)
+ax.barbs(lon_2d, lat_2d, u_wind850.m, v_wind850.m, pivot='middle', color='black', regrid_shape=20, transform=datacrs, zorder=1)
 
-plt.title('GFS 850MB: Relative Humidity, Pot. Temp, and Winds', loc='left')
+plt.title('GFS 850MB: Mixing Ratio, Pot. Temp, and Winds', loc='left')
 plt.title('VALID: {:s} UTC'.format(str(time)), loc='right')
